@@ -104,7 +104,6 @@ print(fm2, dig = 3)
 # The following exercise takes us through a more realistic and complex model, which includes covariates
 
 ## 10.4 - Realistic site-occupancy model
-
 # MODEL
 # For occupancy:
 # z_i ~ Bernoulli(phi_i) with logit(phi_i) = B_0 + B_1*vegHt_i
@@ -226,8 +225,6 @@ fs.fn <- function(fm){
   out <- c(Nocc = Nocc, psi.fs = psi.fs)
   return(out)
 }
-
-
 
 
 
