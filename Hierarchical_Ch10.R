@@ -326,8 +326,6 @@ params <- c("alpha0", "alpha1", "beta0", "beta1", "N.occ", "psi.fs", "psi.pred",
 # MCMC settings
 ni <- 25000 ; nt <- 10 ; nb <- 2000 ; nc <- 3
 
-??bugs
-install.packages("R2WinBUGS")
 # Call WinBUGS from R and summarize posteriors
 out1B <- jags(win.data, inits, parameters.to.save = params,
               model.file = "model.txt",
