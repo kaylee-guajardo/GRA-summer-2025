@@ -4,6 +4,7 @@ library(tidyverse)
 library(unmarked)
 library(jagsUI)
 library(rjags)
+library(R2jags)
 
 set.seed(24)
 
@@ -104,6 +105,7 @@ print(fm2, dig = 3)
 # The following exercise takes us through a more realistic and complex model, which includes covariates
 
 ## 10.4 - Realistic site-occupancy model
+
 # MODEL
 # For occupancy:
 # z_i ~ Bernoulli(phi_i) with logit(phi_i) = B_0 + B_1*vegHt_i
@@ -226,7 +228,110 @@ fs.fn <- function(fm){
   return(out)
 }
 
+# Bootstrap the function
+fs.hat <- fs.fn(fm1.occ) # Point estimate
+system.time(pb.fs <- parboot(fm1.occ, fs.fn, nsim = 100, report = 10)) # Quicker method
 
+# Summarize bootstrap distributions
+summary(pb.fs@t.star)
 
+# Get 95% bootstrapped CIs
+(tmp1 <- quantile(pb.fs@t.star[,1], prob = c(0.025, 0.975)))
+(tmp2 <- quantile(pb.fs@t.star[,2], prob = c(0.025, 0.975)))
 
+# Plot bootstrap distribution of number of occupied sites
+par(mfrow = c(1, 2), mar = c(5, 4, 3, 2))
+hist(pb.fs@t.star[,1], col = "grey", breaks = 80, xlim = c(20, 100), main = "")
+abline(v = fs.hat[1], col = "blue", lwd = 3) # add point estimate
+abline(v = tmp1, col = "grey", lwd = 3) # add 95% CIs
+abline(v = sum(apply(y, 1, max)), lty = 2, lwd = 3) # observed occ sites
+abline(v = sum(z), col = "red", lwd = 3) # true occ sites
+# Predict function yields estimates of the population paramater phi = the expected presence/absence status for a site i
+# ranef function yields estimates for z_i, the realized presence/absence status of site i - takes into account covariates AND whether species was detected or not (y_i)
+
+# Main effects ANCOVA linear models for both occurance and detection components
+# Occurrence model: additive effects of habitat and veg height
+# Detection model: additive effects of time and wind
+fm2.occ <- occu(~time+wind-1 ~hab+vegHt-1, data=umf)
+summary(fm2.occ)
+
+# Predict occupancy for habitat factor levels at average covariate values
+newdat <- data.frame(vegHt = 0, hab = c("A", "B", "C"))
+predict(fm2.occ, type = "state", newdata = newdat, appendData = T)
+
+# Predict detection for time factor levels at average covariate values
+newdat <- data.frame(wind = 0, time = c("1", "2", "3"))
+predict(fm2.occ, type = "det", newdata = newdat, appendData = T)
+
+# Same thing, but an interaction model
+# Occurrence model: interaction of habitat and veg height
+# Detection model: interaction of time and wind
+fm3.occ <- occu(~time*wind-1-wind ~hab*vegHt-1-vegHt, data = umf)
+summary(fm3.occ)
+
+# Perform LRT
+LRT(fm2.occ, fm3.occ)
+# Test results indicate that interactive model is not substantially better than additive model (X^2_4 = 7.459, p-value = 0.1125)
+
+# Fit simple occupancy model w covariates in BUGS
+# Bundle and summarize data set
+str(win.data <- list(y=y, vegHt = vegHt, wind = wind, M = nrow(y), J = ncol(y), XvegHt = seq(-1, 1, length.out = 100), Xwind = seq(-1, 1, length.out = 100)))
+
+# specify model in BUGS language
+sink("model.txt")
+cat(
+  "
+  model {
+  
+  # Priors
+  mean.p ~ dunif(0,1) # Detection intercept on prob scale
+  alpha0 <- logit(mean.p) # Detection intercept
+  alpha1 ~ dunif(-20, 20) # Detection slope on wind
+  mean.psi ~ dunif(0,1) # Occupancy intercept on prob scale
+  beta0 <- logit(mean.psi) # Occupancy int
+  beta1 ~ dunif(-20, 20) # Occupancy slope on vegHt
+  
+  # Likelihood
+  for (i in 1:M) {
+  # True state model for the partially observed true state
+  z[i] ~ dbern(psi[i]) # True occupancy z at site i
+  logit(psi[i]) <- beta0 + beta1*vegHt[i]
+  for (j in 1:J) {
+  # Observation model for the actual obs
+  y[i,j] ~ dbern(p.eff[i,j]) # Detection-nondetection at i and j
+  p.eff[i,j] <- z[i]*p[i,j] # `straw man` for WinBUGS
+  logit(p[i,j]) <- alpha0 + alpha1*wind[i,j]
+  }
+  }
+  
+  # Derived quantiles
+  N.occ <- sum(z[]) # Number of occupied sites among sample of M
+  psi.fs <- N.occ/M # Proportion of occupied sites among sample of M
+  for (k in 1:100){
+  logit(psi.pred[k]) <- beta0 + beta1*XvegHt[k] # psi predictions
+  logit(p.pred[k]) <- alpha0 + alpha1*Xwind[k] # p predictions
+  }
+  }
+  ", fill = T
+)
+sink()
+
+# Initial values: must give for same quantiles as priors given! 
+zst <- apply(y, 1, max)
+inits <- function() list(z = zst, mean.p = runif(1), alpha1 = runif(1), mean.psi = runif(1), beta(1) = runif(1))
+
+# Parameters monitored
+params <- c("alpha0", "alpha1", "beta0", "beta1", "N.occ", "psi.fs", "psi.pred", "p.pred", "z")
+
+# MCMC settings
+ni <- 25000 ; nt <- 10 ; nb <- 2000 ; nc <- 3
+
+??bugs
+install.packages("R2WinBUGS")
+# Call WinBUGS from R and summarize posteriors
+out1B <- jags(win.data, inits, parameters.to.save = params,
+              model.file = "model.txt",
+              n.chains = nc, n.iter = ni,
+              n.burnin = nb, n.thin = nt)
+print(out1B, dig = 3)
 
