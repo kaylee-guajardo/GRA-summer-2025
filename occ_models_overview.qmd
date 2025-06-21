@@ -1,0 +1,89 @@
+---
+title: "Occupancy Models: An Overview"
+author: "Kaylee Guajardo"
+date: "June 20, 2025"
+format: html
+editor: visual
+---
+
+## Introduction
+
+The following document contains an outline to three major types of occupancy models:
+
+1\) standard single-species (false negative errors only),
+
+2\) standard single-species with false positive errors, and
+
+3\) standard multi-species.
+
+Note that for each of the models under the formal theoretical model subsection, I have broken up each model into discernible components; minimally, all models have a component for the latent true occupancy state and the manifest observed detection state, with the latter conditional on the former.
+
+To avoid redundancy, random variables, indices, and parameters are defined once prior to the theoretical model write-up for each type of occupancy model.
+
+Before diving into the model overviews, two methods used for parameter estimation are enumerated below.
+
+#### Maximum Likelihood Estimation (MLE)
+
+#### Bayesian Estimation
+
+## Standard single-species occupancy model
+
+#### Random variables and indices (in the context of NABat)
+
+-   $i$ indexes a grid cell in the 2020 NABat sample in MT, $i = 1, ..., n_{2020}$ grid cells
+
+-   $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*, $j = 1, ..., J_i$ visits
+
+-   $Z_i$ denotes the true occupancy state for the focal species in grid cell $i$, which is 1 if occupied or 0 if unoccupied
+
+-   $Y_{ij}$ denotes the observed detection status for the focal species in grid cell $i$ during visit $j$, which is 1 if detected or 0 if undetected
+
+#### Parameters (in the context of NABat)
+
+-   $\psi_i$ is the probability of focal species occurrence at grid cell $i$
+
+-   $p_{ij}$ is the rate of detection of the focal species at grid cell $i$ during visit $j$
+
+#### Formal theoretical model
+
+###### Latent occupancy state compononent
+
+$$
+z_i \sim \mathrm{Bernoulli}(\psi_i)
+$$
+
+$$
+\mathrm{logit}(\psi_i) = \mathbf{X}_i^T \mathbf{\beta}
+$$
+
+where,
+
+-   $\mathbf{X}_i^T$ is a transposed vector of covariates that affect the probability of focal species occurrence ($\psi_i$) at grid cell $i$
+
+-   $\mathbf{\beta}$ is a vector of regression coefficients (including an intercept) for the latent occupancy component of the model
+
+###### Manifest observed detection component
+
+$$
+y_{ij} \sim \mathrm{Bernoulli}(p_{ij} z_i)
+$$
+
+$$
+\mathrm{logit}(p_{ij}) = \mathbf{V}_{ij}^T \mathbf{\alpha}
+$$
+
+where,
+
+-   $\mathbf{V}_{ij}^T$ is a transposed vector of covariates that affect the rate of detection of the focal species ($p_{ij}$) at grid cell $i$ for visit $j$
+
+-   $\mathbf{\alpha}$ is a vector of regression coefficients (including an intercept) for the manifest observed detection component of the model
+
+### Model likelihood
+
+$$
+L(\psi_i | \mathbf{z}_i) \displaystyle \prod_{i = 1}
+$$
+
+## Standard single-species false-positive occupancy model
+
+## Standard multi-species occupancy model
