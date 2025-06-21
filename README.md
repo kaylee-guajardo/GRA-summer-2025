@@ -1,3 +1,6 @@
-# Applied-Hierarchical-Modeling-in-Ecology
+# GRA-summer-2025
+This repository contains all materials related to my summer 2025 GRA position suprvised by Dr. Katie Banner. 
 
-This is a place for me to practice learning how to use GitHub while working through coding examples from the Applied Hierarchical Modeling in Ecology textbook.
+Functionally, this serves:
+- As a centralized place to hold all materials I produce while working in this position
+- To allow me to practice using GitHub
