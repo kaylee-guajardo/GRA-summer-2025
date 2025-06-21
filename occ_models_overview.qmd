@@ -24,6 +24,24 @@ Before diving into the model overviews, two methods used for parameter estimatio
 
 #### Maximum Likelihood Estimation (MLE)
 
+Maximum Likelihood Estimation of a parameter works by finding at which value of the parameter is the joint likelihood maximized. By hand, this is typically done by:
+
+1.  Set up the joint likelihood
+
+    If observations are independent from each other, then one can take the product of the individual likelihoods for each observation to find the joint likelihood.
+
+2.  Take the log of the likelihood (recommended but optional)
+
+    Typically, calculations are simplified by taking the log of the joint likelihood prior to performing calculus to find the value of the parameter at the maximum of the likelihood.
+
+3.  Take the first derivative with respect to the parameter of interest of the joint likelihood or log-likelihood
+
+4.  Set equal to zero and solve for the parameter value
+
+5.  Verify that the parameter value indeed is at the likelihood maximum
+
+    This step is typically done by first finding the second derivative of the likelihood and verifying that it is less than 0, and then checking the boundaries to check whether the true maximum of the likelihood exists at the endpoints.
+
 #### Bayesian Estimation
 
 ## Standard single-species occupancy model
@@ -78,11 +96,21 @@ where,
 
 -   $\mathbf{\alpha}$ is a vector of regression coefficients (including an intercept) for the manifest observed detection component of the model
 
+### Model assumptions
+
+-   All detection observations ($y_{ij}$) are independent across grid cells
+
+-   A grid cell is closed to changes in focal species occupancy status throughout the surveying period
+
+-   Model covariates are linearly linked to parameters on the logit scale
+
 ### Model likelihood
 
 $$
-L(\psi_i | \mathbf{z}_i) \displaystyle \prod_{i = 1}
+L(\psi | \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} 
 $$
+
+### Bayesian estimation
 
 ## Standard single-species false-positive occupancy model
 
