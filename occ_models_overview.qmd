@@ -20,11 +20,11 @@ Note that for each of the models under the formal theoretical model subsection, 
 
 To avoid redundancy, random variables, indices, and parameters are defined once prior to the theoretical model write-up for each type of occupancy model.
 
-Before diving into the model overviews, two methods used for parameter estimation are enumerated below.
+Before diving into the model overviews, two methods used for parameter estimation are enumerated below, along with a comparison in how they interpret the results.
 
 #### Maximum Likelihood Estimation (MLE)
 
-Maximum Likelihood Estimation of a parameter works by finding at which value of the parameter is the joint likelihood maximized. By hand, this is typically done by:
+Maximum Likelihood Estimation of a parameter works by finding at which value of the parameter the joint likelihood maximized. By hand, this is typically done by:
 
 1.  Set up the joint likelihood
 
@@ -44,13 +44,37 @@ Maximum Likelihood Estimation of a parameter works by finding at which value of 
 
 #### Bayesian Estimation
 
+Bayesian estimation is based, unsurprisingly, on Bayes Theorem:
+
+$$
+P(\theta | X) = \dfrac{P(X | \theta) P(\theta)}{P(X)}
+$$
+
+where,
+
+-   $\theta$ is the parameter of interest
+
+-   $X$ is the observed data
+
+-   $P(X | \theta)$ is the called the likelihood: the probability distribution in which the data $X$ is conditional on the parameter $\theta$
+
+-   $P(\theta)$ is called the prior: the presumed probability distribution of the parameter of interest prior to observing the data
+
+-   $P(X)$ is called the marginal: the probability distribution of the observed data
+
+-   $P(\theta | X)$ is called the posterior: the probability distribution of the parameter of interest $\theta$ conditional on the observed data $X$
+
+Note that unlike MLE, Bayesian estimation of parameters assumes the parameter(s) of interest are random variables.
+
+Typically, researchers define the prior *a priori* to observing the data. Then, once data is in hand, researched will use MCMC algorithms to approximate the posterior distribution of the parameter of interest conditional on the data to produce coefficient values for the model.
+
 #### Parameter interpretation differences: MLE vs. Bayesian estimation
 
-MLE and Bayesian estimation take differing approaches when interpreting parameters in a given model - differences based in a fundamentally contrasting philosophy in regards to the relationship between random variables and parameters.
+MLE and Bayesian estimation take differing approaches when interpreting parameters in a given model - differences based in a fundamentally contrasting philosophy in regards to the relationship between random variables and parameters. I consider it the statistician's twist on the "chicken or the egg" debate.
 
-MLE assumes a frequentist interpretation of parameters of interest and random variables. That is, it assumes parameters are fixed values that dictate random variables, while observed data are assumed to be manifestations of those random variables with randomness inherent to their existence.
+MLE assumes a frequentist interpretation of parameters of interest and random variables. That is, it assumes parameters are fixed values that dictate random variables, while observed data are assumed to be manifestations of those random variables with inherent randomness. Thus, the results from MLE of parameters are typically concrete, fixed values with given confidence intervals of where that parameter likely lies across samples.
 
-In contrast, Bayesian estimation assumes an entirely different origin story. Rather than parameters being fixed values, parameters are considered to be random variables themselves, while observed data are fixed.
+In contrast, Bayesian estimation assumes an entirely different origin story. Rather than parameters being fixed values with data arising from distributions dictated by those parameter values, parameters are considered to be random variables themselves, while the observed data are fixed. As a result, Bayesian estimation of parameters typically leads us to find a posterior probability distribution, $P(\theta | X)$, which mirrors the described philosophical assumption.
 
 ## Standard single-species occupancy model
 
