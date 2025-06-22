@@ -44,6 +44,14 @@ Maximum Likelihood Estimation of a parameter works by finding at which value of 
 
 #### Bayesian Estimation
 
+#### Parameter interpretation differences: MLE vs. Bayesian estimation
+
+MLE and Bayesian estimation take differing approaches when interpreting parameters in a given model - differences based in a fundamentally contrasting philosophy in regards to the relationship between random variables and parameters.
+
+MLE assumes a frequentist interpretation of parameters of interest and random variables. That is, it assumes parameters are fixed values that dictate random variables, while observed data are assumed to be manifestations of those random variables with randomness inherent to their existence.
+
+In contrast, Bayesian estimation assumes an entirely different origin story. Rather than parameters being fixed values, parameters are considered to be random variables themselves, while observed data are fixed.
+
 ## Standard single-species occupancy model
 
 #### Random variables and indices (in the context of NABat)
