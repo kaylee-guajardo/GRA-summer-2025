@@ -64,7 +64,7 @@ Maximum Likelihood Estimation of a parameter works by finding at which value of 
 
 #### Formal theoretical model
 
-###### Latent occupancy state compononent
+###### Latent occupancy state component
 
 $$
 z_i \sim \mathrm{Bernoulli}(\psi_i)
@@ -96,7 +96,7 @@ where,
 
 -   $\mathbf{\alpha}$ is a vector of regression coefficients (including an intercept) for the manifest observed detection component of the model
 
-### Model assumptions
+#### Model assumptions
 
 -   All detection observations ($y_{ij}$) are independent across grid cells
 
@@ -104,14 +104,126 @@ where,
 
 -   Model covariates are linearly linked to parameters on the logit scale
 
-### Model likelihood
+#### Model likelihood
 
 $$
 L(\psi | \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} 
 $$
 
-### Bayesian estimation
+#### Bayesian estimation
 
 ## Standard single-species false-positive occupancy model
 
+#### Random variables and indices (in the context of NABat)
+
+#### Parameters (in the context of NABat)
+
+#### Formal theoretical model
+
+#### Model assumptions
+
+#### Model likelihood
+
+#### Bayesian estimation
+
 ## Standard multi-species occupancy model
+
+#### Random variables and indices (in the context of NABat)
+
+-   $i$ indexes a grid cell in the 2020 NABat sample in MT, $i = 1, ..., n_{2020}$ grid cells
+
+-   $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*, $j = 1, ..., J_i$ visits
+
+-   $k$ indexes a bat species of interest, $k = 1, ..., K$ bat species
+
+-   $Z_{ik}$ denotes the true occupancy state for a bat species $k$ in grid cell $i$, which is 1 if occupied or 0 if unoccupied
+
+-   $Y_{ijk}$ denotes the observed detection status for a bat species $k$ in grid cell $i$ during visit $j$, which is 1 if detected or 0 if undetected
+
+#### Parameters (in the context of NABat)
+
+-   $\psi_{ik}$ is the probability of a bat species $k$ occurrence at grid cell $i$
+
+-   $p_{ijk}$ is the rate of detection of a bat species $k$ at grid cell $i$ during visit $j$
+
+#### Formal theoretical model
+
+###### Latent occupancy state component
+
+$$
+z_{ik} \sim \mathrm{Bernoulli}(\psi_{ik})
+$$
+
+$$
+\mathrm{logit}(\psi_{ik}) = \mathbf{X}_{ik}^T \mathbf{\beta}_k
+$$
+
+where,
+
+-   $\mathbf{X}_{ik}^T$ is a transposed vector of covariates that affect the probability of a bat species $k$ occurrence ($\psi_{ik}$) at grid cell $i$
+
+-   $\mathbf{\beta}_k$ is a vector of regression coefficients (including an intercept) for the latent occupancy component of the model for a bat species $k$
+
+###### Manifest observed detection component
+
+$$
+y_{ijk} \sim \mathrm{Bernoulli}(p_{ijk} z_{ik})
+$$
+
+$$
+\mathrm{logit}(p_{ijk}) = \mathbf{V}_{ijk}^T \mathbf{\alpha}_{k}
+$$
+
+where,
+
+-   $\mathbf{V}_{ijk}^T$ is a transposed vector of covariates that affect the rate of detection ($p_{ijk}$) for a bat species $k$ at grid cell $i$ for visit $j$
+
+-   $\mathbf{\alpha}_k$ is a vector of regression coefficients (including an intercept) for the manifest observed detection component of the model for a bat species $k$
+
+###### Random effects for coefficients component
+
+Species-specific regression coefficients for occupancy ($\mathbf{\beta}_k$) and detection ($\mathbf{\alpha}_k$) are modeled as random effects based on bat community-level normal distributions.
+
+The following demonstrates what this looks like by illuminating the random effect for the intercept of occurrence, $\beta_{0, k}$, for a given bat species $k$:
+
+$$
+\beta_{0, k} \sim \mathbb{N}(\mu_{\beta_0}, \tau_{\beta_0}^2)
+$$
+
+where,
+
+-   $\mu_{\beta_0}$ is the bat community-level occurrence intercept
+
+-   $\tau_{\beta_0}^2$ is the variance of the occurrence intercept among bat species in the community
+
+Assuming there are $b$ total coefficients to estimate bat species occurrence, the setup enumerated above would be repeated for all other occurrence coefficients, $\beta_1, ..., \beta_b$.
+
+Similarly, we can apply this structure for the intercept of detection, $\alpha_{0, k}$ for a given bat species $k$:
+
+$$
+\alpha_{0, k} \sim \mathbb{N}(\mu_{\alpha_0}, \tau_{\alpha_0}^2)
+$$
+
+where,
+
+-   $\mu_{\alpha_0}$ is the bat community-level detection intercept
+
+-   $\tau_{\alpha_0}^2$ is the variance of the detection intercept among bat species in the community
+
+Assuming there are $a$ total coefficients to estimate bat species detection, the random effect structure above would be replicated for all other detection coefficients, $\alpha_1, ..., \alpha_a$.
+
+#### Model assumptions
+
+-   All detection observations ($y_{ijk}$) are independent across grid cells
+
+-   A grid cell is closed to changes in a bat species $k$ occupancy status throughout the surveying period
+
+-   Model covariates are linearly linked to their respective parameters on the logit scale
+
+#### Model likelihood
+
+$$
+L(\psi | \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} 
+$$
+
+#### Bayesian estimation
