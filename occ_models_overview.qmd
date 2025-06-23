@@ -146,6 +146,27 @@ $$
 
 #### Bayesian estimation
 
+#### Simulation study: MLE vs Bayesian estimation
+
+First, we create a function to simulate data for a standard single-species occupancy model (accounting for false negative errors only):
+
+```{r}
+sim_occmod1_data <- function(n_sites = 100, j_visits = 2, psi = 0.8, p = 0.5) {
+  # Latent occupancy state
+  z <- rbinom(n = n_sites, size = 1, p = psi) 
+  # Detection obs matrix
+  y <- matrix(data = NA, nrow = n_sites, ncol = j_visits)
+  # Detection obs data
+for (i in 1:n_sites) {
+  y[i, ] <- rbinom(n = j_visits, size = 1, prob = p*z[i])
+}
+  dat <- cbind(z, y)
+  return(dat)
+}
+
+dat <- sim_occmod1_data()
+```
+
 ## Standard single-species false-positive occupancy model
 
 #### Random variables and indices (in the context of NABat)
