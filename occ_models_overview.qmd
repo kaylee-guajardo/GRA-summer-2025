@@ -141,8 +141,14 @@ where,
 #### Model likelihood
 
 $$
-L(\psi | \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} 
+L(\psi, \mathbf{p} | \mathbf{y}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}}\cdot \psi_i^{z_i}(1-\psi_i)^{1-z_i} \right ]
 $$
+
+where,
+
+-   $\mathbf{p}$ is a matrix of detection probabilities $p_{ij}$ across grid cells $i = 1, ..., n_{2020}$ and their respective visits $j = 1, ..., J_i$
+
+-   $\mathbf{y}$ is a matrix of the observed detection states (1 if detected, 0 if undetected) across grid cells $i = 1, ..., n_{2020}$ and their respective visits $j = 1, ..., J_i$
 
 #### Bayesian estimation
 
