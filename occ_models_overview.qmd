@@ -2,7 +2,7 @@
 title: "Occupancy Models: An Overview"
 author: "Kaylee Guajardo"
 date: "June 20, 2025"
-format: html
+format: gfm
 editor: visual
 ---
 
@@ -141,7 +141,7 @@ where,
 #### Model likelihood
 
 $$
-L(\psi, \mathbf{p} | \mathbf{y}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}}\cdot \psi_i^{z_i}(1-\psi_i)^{1-z_i} \right ]
+L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}}\cdot \psi_i^{z_i}(1-\psi_i)^{1-z_i} \right ]
 $$
 
 where,
@@ -149,6 +149,42 @@ where,
 -   $\mathbf{p}$ is a matrix of detection probabilities $p_{ij}$ across grid cells $i = 1, ..., n_{2020}$ and their respective visits $j = 1, ..., J_i$
 
 -   $\mathbf{y}$ is a matrix of the observed detection states (1 if detected, 0 if undetected) across grid cells $i = 1, ..., n_{2020}$ and their respective visits $j = 1, ..., J_i$
+
+-   $\mathbf{z}$ is a vector of the latent occupancy states (1 if occupied, 0 if unoccupied) across grid cells $i = 1, ..., n_{2020}$
+
+This full joint likelihood can be broken down by its three possible scenarios:
+
+1.  The grid cell $i$ is unoccupied ($z_0 = 0$) by the focal species, and the species is not detected ($y_{ij} = 0$) during that visit $j$
+
+    $$
+    L(p_{ij}, \psi_i | y_{ij} = 0, z_i = 0) = 1 - \psi_i
+    $$
+
+2.  The grid cell $i$ is occupied ($z_0 = 1$) by the focal species, and the species is detected ($y_{ij} = 1$) during that visit $j$
+
+    $$
+    L(p_{ij}, \psi_i | y_{ij} = 1, z_i = 1) = (1 - p_{ij}) \psi_i
+    $$
+
+3.  The grid cell $i$ is occupied ($z_0 = 1$) by the focal species, but the species is not detected ($y_{ij} = 0$) during that visit $j$ (*false negative error*)
+
+    $$
+    L(p_{ij}, \psi_i | y_{ij} = 0, z_i = 1) = p_{ij} \psi_i
+    $$
+
+Merging these likelihoods, we can create another form of the full joint likelihood using indicator functions:
+
+$$
+L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (1 - \psi_i) \cdot \mathbb{I}_{00} + (1-p_{ij}) \psi_i \cdot \mathbb{I}_{10} + p_{ij} \psi_i \cdot \mathbb{I}_{11} \right ]
+$$
+
+where
+
+-   $\mathbb{I}_{00} = 1$ if site $i$ is unoccupied by focal species and undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
+
+-   $\mathbb{I}_{10} = 1$ if site $i$ is occupied by focal species but undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
+
+-   $\mathbb{I}_{11} = 1$ if site $i$ is occupied by focal species detected during visit $j$, $\mathbb{I}_{11} = 0$ otherwise
 
 #### Bayesian estimation
 
