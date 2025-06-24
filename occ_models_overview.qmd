@@ -66,7 +66,7 @@ where,
 
 Note that unlike MLE, Bayesian estimation of parameters assumes the parameter(s) of interest are random variables.
 
-Typically, researchers define the prior *a priori* to observing the data. Then, once data is in hand, researched will use MCMC algorithms to approximate the posterior distribution of the parameter of interest conditional on the data to produce coefficient values for the model.
+Typically, researchers define the prior *a priori* to observing the data. Then, once data is in hand, researchers will use MCMC algorithms to approximate the posterior distribution of the parameter of interest conditional on the data to produce coefficient values for the model.
 
 #### Parameter interpretation: MLE vs. Bayesian estimation
 
@@ -178,13 +178,11 @@ $$
 L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (1 - \psi_i) \cdot \mathbb{I}_{00} + (1-p_{ij}) \psi_i \cdot \mathbb{I}_{10} + p_{ij} \psi_i \cdot \mathbb{I}_{11} \right ]
 $$
 
-where
+where,
 
--   $\mathbb{I}_{00} = 1$ if site $i$ is unoccupied by focal species and undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
-
--   $\mathbb{I}_{10} = 1$ if site $i$ is occupied by focal species but undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
-
--   $\mathbb{I}_{11} = 1$ if site $i$ is occupied by focal species detected during visit $j$, $\mathbb{I}_{11} = 0$ otherwise
+1.  $\mathbb{I}_{00} = 1$ if site $i$ is unoccupied by focal species and undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
+2.  $\mathbb{I}_{10} = 1$ if site $i$ is occupied by focal species but undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
+3.  $\mathbb{I}_{11} = 1$ if site $i$ is occupied by focal species detected during visit $j$, $\mathbb{I}_{11} = 0$ otherwise
 
 #### Bayesian estimation
 
