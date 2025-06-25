@@ -186,6 +186,22 @@ where,
 
 #### Bayesian estimation
 
+While the likelihood described above stays consistent for Bayesian estimation, we must establish the priors for the two parameters: $\psi_i$ and $p_{ij}$.
+
+The common distribution of choice for both of these priors is a Beta distribution. This makes sense, given that the Beta distribution is the conjugate prior for a likelihood with a Bernoulli distribution (which aligns with the likelihood established for this type of model) and it preserves the range of our parameters which, since they are probabilities, are bounded by 0 and 1.
+
+Therefore, the priors are:
+
+$$
+\psi \sim \mathrm{Beta}(\gamma_{\psi}, \delta_{\psi})
+$$
+
+$$
+p \sim \mathrm{Beta}(\gamma_{p}, \delta_{p})
+$$
+
+Ideally, these priors are informative - that is, the values of $\gamma_{\psi}, \delta_{\psi}, \gamma_p$ and $\delta_p$ are selected based on current ecological knowledge (as are the prior distributions), but this often isn't the case.
+
 #### Simulation study: MLE vs Bayesian estimation
 
 First, we create a function to simulate data for a standard single-species occupancy model (accounting for false negative errors only):
