@@ -82,7 +82,7 @@ In contrast, Bayesian estimation assumes an entirely different origin story. Rat
 
 -   $i$ indexes a grid cell in the 2020 NABat sample in MT, $i = 1, ..., n_{2020}$ grid cells
 
--   $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*, $j = 1, ..., J_i$ visits
+-   $j$ indexes a survey (i.e. visit) of a grid cell *i*, $j = 1, ..., J_i$ visits
 
 -   $Z_i$ denotes the true occupancy state for the focal species in grid cell $i$, which is 1 if occupied or 0 if unoccupied
 
@@ -141,7 +141,7 @@ where,
 #### Model likelihood
 
 $$
-L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}}\cdot \psi_i^{z_i}(1-\psi_i)^{1-z_i} \right ]
+L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \left [ \psi_i^{z_i}(1-\psi_i)^{1-z_i} \displaystyle \prod_{j = 1}^{J_i} (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}} \right ]
 $$
 
 where,
@@ -181,7 +181,7 @@ $$
 where,
 
 1.  $\mathbb{I}_{00} = 1$ if site $i$ is unoccupied by focal species and undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
-2.  $\mathbb{I}_{10} = 1$ if site $i$ is occupied by focal species but undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
+2.  $\mathbb{I}_{10} = 1$ if site $i$ is occupied by focal species but undetected during visit $j$, $\mathbb{I}_{10} = 0$ otherwise
 3.  $\mathbb{I}_{11} = 1$ if site $i$ is occupied by focal species detected during visit $j$, $\mathbb{I}_{11} = 0$ otherwise
 
 #### Bayesian estimation
@@ -213,7 +213,7 @@ dat <- sim_occmod1_data()
 
 -   $i$ indexes a grid cell in the 2020 NABat sample in MT, $i = 1, ..., n_{2020}$ grid cells
 
--   $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*, $j = 1, ..., J_i$ visits
+-   $j$ indexes a survey (i.e. visit) of a grid cell *i*, $j = 1, ..., J_i$ visits
 
 -   $Z_{i}$ denotes the true occupancy state for the focal bat species in grid cell $i$, which is 1 if occupied or 0 if unoccupied
 
@@ -295,7 +295,7 @@ where,
 
 -   $i$ indexes a grid cell in the 2020 NABat sample in MT, $i = 1, ..., n_{2020}$ grid cells
 
--   $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*, $j = 1, ..., J_i$ visits
+-   $j$ indexes a survey (i.e. visit) of a grid cell *i*, $j = 1, ..., J_i$ visits
 
 -   $k$ indexes a bat species of interest, $k = 1, ..., K$ bat species
 
