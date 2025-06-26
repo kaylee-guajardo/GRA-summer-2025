@@ -3,6 +3,7 @@ title: "Occupancy Models: An Overview"
 author: "Kaylee Guajardo"
 date: "June 20, 2025"
 format: gfm
+  md: default
 editor: visual
 ---
 
