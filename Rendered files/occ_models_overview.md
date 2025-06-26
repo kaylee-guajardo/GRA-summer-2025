@@ -1,0 +1,513 @@
+# Occupancy Models: An Overview
+Kaylee Guajardo
+2025-06-20
+
+## Introduction
+
+The following document contains an outline to three major types of
+occupancy models:
+
+1\) standard single-species (false negative errors only),
+
+2\) standard single-species with false positive errors, and
+
+3\) standard multi-species.
+
+Note that for each of the models under the formal theoretical model
+subsection, I have broken up each model into discernible components;
+minimally, all models have a component for the latent true occupancy
+state and the manifest observed detection state, with the latter
+conditional on the former.
+
+To avoid redundancy, random variables, indices, and parameters are
+defined once prior to the theoretical model write-up for each type of
+occupancy model.
+
+Before diving into the model overviews, two methods used for parameter
+estimation are enumerated below, along with a comparison in how they
+interpret the results.
+
+#### Maximum Likelihood Estimation (MLE)
+
+Maximum Likelihood Estimation of a parameter works by finding at which
+value of the parameter the joint likelihood maximized. By hand, this is
+typically done by:
+
+1.  Set up the joint likelihood
+
+    If observations are independent from each other, then one can take
+    the product of the individual likelihoods for each observation to
+    find the joint likelihood.
+
+2.  Take the log of the likelihood (recommended but optional)
+
+    Typically, calculations are simplified by taking the log of the
+    joint likelihood prior to performing calculus to find the value of
+    the parameter at the maximum of the likelihood.
+
+3.  Take the first derivative with respect to the parameter of interest
+    of the joint likelihood or log-likelihood
+
+4.  Set equal to zero and solve for the parameter value
+
+5.  Verify that the parameter value indeed is at the likelihood maximum
+
+    This step is typically done by first finding the second derivative
+    of the likelihood and verifying that it is less than 0, and then
+    checking the boundaries to check whether the true maximum of the
+    likelihood exists at the endpoints.
+
+#### Bayesian Estimation
+
+Bayesian estimation is based, unsurprisingly, on Bayes Theorem:
+
+$$
+P(\theta | X) = \dfrac{P(X | \theta) P(\theta)}{P(X)}
+$$
+
+where,
+
+- $\theta$ is the parameter of interest
+
+- $X$ is the observed data
+
+- $P(X | \theta)$ is the called the likelihood: the probability
+  distribution in which the data $X$ is conditional on the parameter
+  $\theta$
+
+- $P(\theta)$ is called the prior: the presumed probability distribution
+  of the parameter of interest prior to observing the data
+
+- $P(X)$ is called the marginal: the probability distribution of the
+  observed data
+
+- $P(\theta | X)$ is called the posterior: the probability distribution
+  of the parameter of interest $\theta$ conditional on the observed data
+  $X$
+
+Note that unlike MLE, Bayesian estimation of parameters assumes the
+parameter(s) of interest are random variables.
+
+Typically, researchers define the prior *a priori* to observing the
+data. Then, once data is in hand, researchers will use MCMC algorithms
+to approximate the posterior distribution of the parameter of interest
+conditional on the data to produce coefficient values for the model.
+
+#### Parameter interpretation: MLE vs. Bayesian estimation
+
+MLE and Bayesian estimation take differing approaches when interpreting
+parameters in a given model - differences based in a fundamentally
+contrasting philosophy in regards to the relationship between random
+variables and parameters. I consider it the statistician’s twist on the
+“chicken or the egg” debate.
+
+MLE assumes a frequentist interpretation of parameters of interest and
+random variables. That is, it assumes parameters are fixed values that
+dictate random variables, while observed data are assumed to be
+manifestations of those random variables with inherent randomness. Thus,
+the results from MLE of parameters are typically concrete, fixed values
+with given confidence intervals of where that parameter likely lies
+across samples.
+
+In contrast, Bayesian estimation assumes an entirely different origin
+story. Rather than parameters being fixed values with data arising from
+distributions dictated by those parameter values, parameters are
+considered to be random variables themselves, while the observed data
+are fixed. As a result, Bayesian estimation of parameters typically
+leads us to find a posterior probability distribution, $P(\theta | X)$,
+which mirrors the described philosophical assumption.
+
+## Standard single-species occupancy model
+
+#### Random variables and indices (in the context of NABat)
+
+- $i$ indexes a grid cell in the 2020 NABat sample in MT,
+  $i = 1, ..., n_{2020}$ grid cells
+
+- $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*,
+  $j = 1, ..., J_i$ visits
+
+- $Z_i$ denotes the true occupancy state for the focal species in grid
+  cell $i$, which is 1 if occupied or 0 if unoccupied
+
+- $Y_{ij}$ denotes the observed detection status for the focal species
+  in grid cell $i$ during visit $j$, which is 1 if detected or 0 if
+  undetected
+
+#### Parameters (in the context of NABat)
+
+- $\psi_i$ is the probability of focal species occurrence at grid cell
+  $i$
+
+- $p_{ij}$ is the rate of detection of the focal species at grid cell
+  $i$ during visit $j$
+
+#### Formal theoretical model
+
+###### Latent occupancy state component
+
+$$
+z_i \sim \mathrm{Bernoulli}(\psi_i)
+$$
+
+$$
+\mathrm{logit}(\psi_i) = \mathbf{X}_i^T \mathbf{\beta}
+$$
+
+where,
+
+- $\mathbf{X}_i^T$ is a transposed vector of covariates that affect the
+  probability of focal species occurrence ($\psi_i$) at grid cell $i$
+
+- $\mathbf{\beta}$ is a vector of regression coefficients (including an
+  intercept) for the latent occupancy component of the model
+
+###### Manifest observed detection component
+
+$$
+[y_{ij} | z_i] \sim \mathrm{Bernoulli}(p_{ij} z_i)
+$$
+
+$$
+\mathrm{logit}(p_{ij}) = \mathbf{V}_{ij}^T \mathbf{\alpha}
+$$
+
+where,
+
+- $\mathbf{V}_{ij}^T$ is a transposed vector of covariates that affect
+  the rate of detection of the focal species ($p_{ij}$) at grid cell $i$
+  for visit $j$
+
+- $\mathbf{\alpha}$ is a vector of regression coefficients (including an
+  intercept) for the manifest observed detection component of the model
+
+#### Model assumptions
+
+- All detection observations ($y_{ij}$) are independent across grid
+  cells
+
+- A grid cell is closed to changes in focal species occupancy status
+  throughout the surveying period
+
+- Model covariates are linearly linked to parameters on the logit scale
+
+- No false positive errors (i.e. species misidentification)
+
+#### Model likelihood
+
+$$
+L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}}\cdot \psi_i^{z_i}(1-\psi_i)^{1-z_i} \right ]
+$$
+
+where,
+
+- $\mathbf{p}$ is a matrix of detection probabilities $p_{ij}$ across
+  grid cells $i = 1, ..., n_{2020}$ and their respective visits
+  $j = 1, ..., J_i$
+
+- $\mathbf{y}$ is a matrix of the observed detection states (1 if
+  detected, 0 if undetected) across grid cells $i = 1, ..., n_{2020}$
+  and their respective visits $j = 1, ..., J_i$
+
+- $\mathbf{z}$ is a vector of the latent occupancy states (1 if
+  occupied, 0 if unoccupied) across grid cells $i = 1, ..., n_{2020}$
+
+This full joint likelihood can be broken down by its three possible
+scenarios:
+
+1.  The grid cell $i$ is unoccupied ($z_0 = 0$) by the focal species,
+    and the species is not detected ($y_{ij} = 0$) during that visit $j$
+
+    $$
+    L(p_{ij}, \psi_i | y_{ij} = 0, z_i = 0) = 1 - \psi_i
+    $$
+
+2.  The grid cell $i$ is occupied ($z_0 = 1$) by the focal species, and
+    the species is detected ($y_{ij} = 1$) during that visit $j$
+
+    $$
+    L(p_{ij}, \psi_i | y_{ij} = 1, z_i = 1) = (1 - p_{ij}) \psi_i
+    $$
+
+3.  The grid cell $i$ is occupied ($z_0 = 1$) by the focal species, but
+    the species is not detected ($y_{ij} = 0$) during that visit $j$
+    (*false negative error*)
+
+    $$
+    L(p_{ij}, \psi_i | y_{ij} = 0, z_i = 1) = p_{ij} \psi_i
+    $$
+
+Merging these likelihoods, we can create another form of the full joint
+likelihood using indicator functions:
+
+$$
+L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (1 - \psi_i) \cdot \mathbb{I}_{00} + (1-p_{ij}) \psi_i \cdot \mathbb{I}_{10} + p_{ij} \psi_i \cdot \mathbb{I}_{11} \right ]
+$$
+
+where,
+
+1.  $\mathbb{I}_{00} = 1$ if site $i$ is unoccupied by focal species and
+    undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
+2.  $\mathbb{I}_{10} = 1$ if site $i$ is occupied by focal species but
+    undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
+3.  $\mathbb{I}_{11} = 1$ if site $i$ is occupied by focal species
+    detected during visit $j$, $\mathbb{I}_{11} = 0$ otherwise
+
+#### Bayesian estimation
+
+#### Simulation study: MLE vs Bayesian estimation
+
+First, we create a function to simulate data for a standard
+single-species occupancy model (accounting for false negative errors
+only):
+
+``` r
+sim_occmod1_data <- function(n_sites = 100, j_visits = 2, psi = 0.8, p = 0.5) {
+  # Latent occupancy state
+  z <- rbinom(n = n_sites, size = 1, p = psi) 
+  # Detection obs matrix
+  y <- matrix(data = NA, nrow = n_sites, ncol = j_visits)
+  # Detection obs data
+for (i in 1:n_sites) {
+  y[i, ] <- rbinom(n = j_visits, size = 1, prob = p*z[i])
+}
+  dat <- cbind(z, y)
+  return(dat)
+}
+
+dat <- sim_occmod1_data()
+```
+
+## Standard single-species false-positive occupancy model
+
+#### Random variables and indices (in the context of NABat)
+
+- $i$ indexes a grid cell in the 2020 NABat sample in MT,
+  $i = 1, ..., n_{2020}$ grid cells
+
+- $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*,
+  $j = 1, ..., J_i$ visits
+
+- $Z_{i}$ denotes the true occupancy state for the focal bat species in
+  grid cell $i$, which is 1 if occupied or 0 if unoccupied
+
+- $Y_{ij}$ denotes the observed detection status for the focal bat
+  species in grid cell $i$ during visit $j$, which is 1 if detected or 0
+  if undetected
+
+#### Parameters (in the context of NABat)
+
+- $\psi_i$ is the probability of the focal bat species occurrence at any
+  given grid cell
+
+- $p_{1,ij}$ is the rate of detection of the focal bat species at a grid
+  cell $i$ for visit $j$ given the grid cell is occupied ($z_i=1$)
+
+- $p_{0,ij}$ is the rate of detection of the focal bat species at a grid
+  cell $i$ for visit $j$ given the grid cell is unoccupied ($z_i=0$)
+
+#### Formal theoretical model
+
+###### Latent occupancy state component
+
+$$
+z_i \sim \mathrm{Bernoulli}(\psi_i)
+$$
+
+$$
+\mathrm{logit}(\psi_i) = \mathbf{X}_i^T \mathbf{\beta}
+$$
+
+where,
+
+- $\mathbf{X}_i^T$ is a transposed vector of covariates that affect the
+  probability of focal species occurrence at grid cell $i$ ($\psi$)
+
+- $\mathbf{\beta}$ is a vector of regression coefficients (including an
+  intercept) for the latent occupancy component of the model
+
+###### Observed detection for occupied site component (accounts for false negatives)
+
+$$
+[y_{ij}|z_i = 1] \sim \mathrm{Bernoulli}(p_{1,ij})
+$$
+
+$$
+\mathrm{logit}(p_{1,ij}) = \mathbf{V}_{ij}^T \mathbf{\alpha}_1
+$$
+
+where,
+
+- $\mathbf{V}_{ij}^T$ is a transposed vector of covariates that affect
+  the rate of detection ($p_{1, ij}$) of the focal species at grid cell
+  $i$ during visit $j$ given the grid cell is occupied
+
+- $\mathbf{\alpha}_1$ is a vector of regression coefficients (including
+  an intercept) for the manifest observed detection component of the
+  model given the grid cell $i$ is occupied
+
+###### Observed detection for unoccupied site component (accounts for false positives)
+
+$$
+[y_{ij}|z_i = 0] \sim \mathrm{Bernoulli}(p_{0, ij})
+$$
+
+$$
+\mathrm{logit}(p_{0, ij}) = \mathbf{W}_{ij}^T \mathbf{\alpha}_0
+$$
+
+where,
+
+- $\mathbf{W}_{ij}^T$ is a transposed vector of covariates that affect
+  the rate of detection ($p_{0, ij}$) of the focal species for grid cell
+  $i$ visit $j$ given the grid cell is occupied
+
+- $\mathbf{\alpha}_0$ is a vector of regression coefficients (including
+  an intercept) for the observed detection component of the model given
+  the grid cell is unoccupied
+
+#### Model assumptions
+
+- All detection observations ($y_{ij}$) are independent across grid
+  cells
+
+- A grid cell is closed to changes in the focal bat species occupancy
+  status throughout the surveying period
+
+- Model covariates are linearly linked to their respective parameters on
+  the logit scale
+
+#### Model likelihood
+
+#### Bayesian estimation
+
+## Standard multi-species occupancy model
+
+#### Random variables and indices (in the context of NABat)
+
+- $i$ indexes a grid cell in the 2020 NABat sample in MT,
+  $i = 1, ..., n_{2020}$ grid cells
+
+- $j$ indexes a sampling replicate (i.e. visit) to a grid cell *i*,
+  $j = 1, ..., J_i$ visits
+
+- $k$ indexes a bat species of interest, $k = 1, ..., K$ bat species
+
+- $Z_{ik}$ denotes the true occupancy state for a bat species $k$ in
+  grid cell $i$, which is 1 if occupied or 0 if unoccupied
+
+- $Y_{ijk}$ denotes the observed detection status for a bat species $k$
+  in grid cell $i$ during visit $j$, which is 1 if detected or 0 if
+  undetected
+
+#### Parameters (in the context of NABat)
+
+- $\psi_{ik}$ is the probability of a bat species $k$ occurrence at grid
+  cell $i$
+
+- $p_{ijk}$ is the rate of detection of a bat species $k$ at grid cell
+  $i$ during visit $j$
+
+#### Formal theoretical model
+
+###### Latent occupancy state component
+
+$$
+z_{ik} \sim \mathrm{Bernoulli}(\psi_{ik})
+$$
+
+$$
+\mathrm{logit}(\psi_{ik}) = \mathbf{X}_{ik}^T \mathbf{\beta}_k
+$$
+
+where,
+
+- $\mathbf{X}_{ik}^T$ is a transposed vector of covariates that affect
+  the probability of a bat species $k$ occurrence ($\psi_{ik}$) at grid
+  cell $i$
+
+- $\mathbf{\beta}_k$ is a vector of regression coefficients (including
+  an intercept) for the latent occupancy component of the model for a
+  bat species $k$
+
+###### Manifest observed detection component
+
+$$
+[y_{ijk}|z_{ik}] \sim \mathrm{Bernoulli}(p_{ijk} z_{ik})
+$$
+
+$$
+\mathrm{logit}(p_{ijk}) = \mathbf{V}_{ijk}^T \mathbf{\alpha}_{k}
+$$
+
+where,
+
+- $\mathbf{V}_{ijk}^T$ is a transposed vector of covariates that affect
+  the rate of detection ($p_{ijk}$) for a bat species $k$ at grid cell
+  $i$ for visit $j$
+
+- $\mathbf{\alpha}_k$ is a vector of regression coefficients (including
+  an intercept) for the manifest observed detection component of the
+  model for a bat species $k$
+
+###### Random effects for coefficients component
+
+Species-specific regression coefficients for occupancy
+($\mathbf{\beta}_k$) and detection ($\mathbf{\alpha}_k$) are modeled as
+random effects based on bat community-level normal distributions.
+
+The following demonstrates what this looks like by illuminating the
+random effect for the intercept of occurrence, $\beta_{0, k}$, for a
+given bat species $k$:
+
+$$
+\beta_{0, k} \sim \mathbb{N}(\mu_{\beta_0}, \tau_{\beta_0}^2)
+$$
+
+where,
+
+- $\mu_{\beta_0}$ is the bat community-level occurrence intercept
+
+- $\tau_{\beta_0}^2$ is the variance of the occurrence intercept among
+  bat species in the community
+
+Assuming there are $b$ total coefficients to estimate bat species
+occurrence, the setup enumerated above would be repeated for all other
+occurrence coefficients, $\beta_1, ..., \beta_b$.
+
+Similarly, we can apply this structure for the intercept of detection,
+$\alpha_{0, k}$ for a given bat species $k$:
+
+$$
+\alpha_{0, k} \sim \mathbb{N}(\mu_{\alpha_0}, \tau_{\alpha_0}^2)
+$$
+
+where,
+
+- $\mu_{\alpha_0}$ is the bat community-level detection intercept
+
+- $\tau_{\alpha_0}^2$ is the variance of the detection intercept among
+  bat species in the community
+
+Assuming there are $a$ total coefficients to estimate bat species
+detection, the random effect structure above would be replicated for all
+other detection coefficients, $\alpha_1, ..., \alpha_a$.
+
+#### Model assumptions
+
+- All detection observations ($y_{ijk}$) are independent across grid
+  cells
+
+- A grid cell is closed to changes in a bat species $k$ occupancy status
+  throughout the surveying period
+
+- Model covariates are linearly linked to their respective parameters on
+  the logit scale
+
+#### Model likelihood
+
+$$
+L(\psi | \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} 
+$$
+
+#### Bayesian estimation
