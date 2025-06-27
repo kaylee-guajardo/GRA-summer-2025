@@ -141,8 +141,10 @@ where,
 
 #### Model likelihood
 
+###### Full joint likelihood
+
 $$
-L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \left [ \psi_i^{z_i}(1-\psi_i)^{1-z_i} \displaystyle \prod_{j = 1}^{J_i} (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}} \right ]
+L(\psi, \mathbf{p}, \mathbf{z} | \mathbf{y}) = \displaystyle \prod_{i = 1}^{n_{2020}} \left [ \psi_i^{z_i}(1-\psi_i)^{1-z_i} \displaystyle \prod_{j = 1}^{J_i} (p_{ij}z_i)^{y_{ij}} (1-p_{ij}z_i)^{1 - y_{ij}} \right ]
 $$
 
 where,
@@ -176,7 +178,7 @@ This full joint likelihood can be broken down by its three possible scenarios:
 Merging these likelihoods, we can create another form of the full joint likelihood using indicator functions:
 
 $$
-L(\psi, \mathbf{p} | \mathbf{y}, \mathbf{z}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (1 - \psi_i) \cdot \mathbb{I}_{00} + (1-p_{ij}) \psi_i \cdot \mathbb{I}_{10} + p_{ij} \psi_i \cdot \mathbb{I}_{11} \right ]
+L(\psi, \mathbf{p}, \mathbf{z} | \mathbf{y}) = \displaystyle \prod_{i = 1}^{n_{2020}} \displaystyle \prod_{j = 1}^{J_i} \left [ (1 - \psi_i) \cdot \mathbb{I}_{00} + (1-p_{ij}) \psi_i \cdot \mathbb{I}_{10} + p_{ij} \psi_i \cdot \mathbb{I}_{11} \right ]
 $$
 
 where,
@@ -184,6 +186,26 @@ where,
 1.  $\mathbb{I}_{00} = 1$ if site $i$ is unoccupied by focal species and undetected during visit $j$, $\mathbb{I}_{00} = 0$ otherwise
 2.  $\mathbb{I}_{10} = 1$ if site $i$ is occupied by focal species but undetected during visit $j$, $\mathbb{I}_{10} = 0$ otherwise
 3.  $\mathbb{I}_{11} = 1$ if site $i$ is occupied by focal species detected during visit $j$, $\mathbb{I}_{11} = 0$ otherwise
+
+###### Marginalized likelihood
+
+At the site level $i$:
+
+$$
+P(\mathbf{y}_i|\psi, \mathbf{p}_{i}) = [1-\psi_i + \psi_i \displaystyle \prod_{j = 1}^{J_i}(1-p_{ij})] \cdot \mathrm{I}_{0} + [\psi_i \displaystyle \prod_{j = 1}^{J_i}p_{ij}^{y_{ij}} (1-p_{ij})^{1-y_{ij}}] \cdot \mathrm{I}_1
+$$
+
+where,
+
+-   $\mathbb{I}_{0} = 1$ if the focal species at site $i$ is never detected across all visits 1, ..., $J_i$ ( $\displaystyle \sum_{j = 1}^{J_i} y_{ij} = 0$ ), $\mathbb{I}_{0} = 0$ otherwise
+
+-   $\mathbb{I}_{1} = 1$ if the focal species at site $i$ is detected at least once during the visits 1, ..., $J_i$ ( $\displaystyle \sum_{j = 1}^{J_i} y_{ij} > 0$ ), $\mathbb{I}_{1} = 0$ otherwise
+
+The marginalized full joint likelihood across sites $i = 1, ..., n_{2020}$:
+
+$$
+L(\psi, \mathbf{p} | \mathbf{y}) = \displaystyle \prod_{i = 1}^{n_{2020}} P(\mathbf{y}_i|\psi, \mathbf{p}_{i})
+$$
 
 #### Bayesian estimation
 
