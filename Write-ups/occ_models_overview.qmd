@@ -230,7 +230,10 @@ Ideally, these priors are informative - that is, the values of $\gamma_{\psi}, \
 First, we create a function to simulate data for a standard single-species occupancy model (accounting for false negative errors only):
 
 ```{r}
-sim_occmod1_data <- function(n_sites = 100, j_visits = 2, psi = 0.8, p = 0.5) {
+# Load packages
+library(tidyverse)
+
+sim_occmod1_data <- function(n_sites = 100, j_visits = 2, psi = 0.6, p = 0.5) {
   # Latent occupancy state
   z <- rbinom(n = n_sites, size = 1, p = psi) 
   # Detection obs matrix
@@ -239,11 +242,31 @@ sim_occmod1_data <- function(n_sites = 100, j_visits = 2, psi = 0.8, p = 0.5) {
 for (i in 1:n_sites) {
   y[i, ] <- rbinom(n = j_visits, size = 1, prob = p*z[i])
 }
-  dat <- cbind(z, y)
-  return(dat)
+  return(y)
 }
 
 dat <- sim_occmod1_data()
+```
+
+Next, we create a wrapper function that fits two models, one ML and one Bayesian, to the simulated dataset for a user-specified number of iterations:
+
+```{r}
+library(unmarked)
+
+# Ready df for model fit
+dat <- sim_occmod1_data()
+mod_dat <- unmarkedFrameOccu(y = dat)
+
+# Fit model
+fit_occmod1 <- occu(~ 1 ~ 1, data = mod_dat)
+
+# Pull parameter estimates for psi, p (response scale)
+psi_est <- coef(fit_occmod1)["psi(Int)"] %>% plogis()
+p_est <- coef(fit_occmod1)["p(Int)"] %>% plogis()
+
+# Find 95% CIs
+confint(fit_occmod1, type = 'state')
+confint(fit_occmod1, type = 'det')
 ```
 
 ## Standard single-species false-positive occupancy model
