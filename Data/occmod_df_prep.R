@@ -184,6 +184,19 @@ detection_matrix <- sites_det_df %>%
   select(night1:night8) %>%
   as.matrix()
 
+## CREATE DF FOR UNMARKED FUNCTION -----------------------------------------------------------
+unmarked_det_matrix <- unmarkedFrameOccu(y = detection_matrix)
+
+## FIT UNMARKED: OCCU MODEL -----------------------------------------------------------
+occ_mod <- occu(~1 ~1, data = unmarked_det_matrix)
+
+## VIEW SUMMARY UNMARKED: OCCU MODEL -----------------------------------------------------------
+summary(occ_mod)
+
+# Estimated probability of occupancy (psi) and detection (p)
+coef(occ_mod) %>%
+  plogis()
+
 ## WRITE DET MATRIC FUNCTION FOR ANY SPECIES -----------------------------------------------------------
 
 #detection_matrix <- function(data, species){
