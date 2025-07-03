@@ -28,14 +28,29 @@ summary(bat_data)
 bat_data %>% filter(Nights_Recorded == 37) %>% summary()
 # Can't do that, quality control issue: decom date does NOT represent day after final survey date for grid cell 2977 sites 2 and 4
 
+# New route: use Sample_Night_int
 bat_data %>%
   group_by(SiteID) %>%
-  summarize(max_Sample_Night = max(Sample_Night_int)) %>%
-  arrange(desc(max_Sample_Night))
-# Max is 8
+  summarize(max_Sample_Night = max(Sample_Night_int),
+            max_Decom_Install_diff = max(Nights_Recorded)) %>%
+  arrange(max_Decom_Install_diff)
+# Min total sample nights is 1 (odd) for sites, matches decom install difference
 
 bat_data %>%
   group_by(SiteID) %>%
-  summarize(max_Sample_Night = max(Sample_Night_int)) %>%
+  summarize(max_Sample_Night = max(Sample_Night_int),
+            max_Decom_Install_diff = max(Nights_Recorded)) %>%
   arrange(desc(max_Sample_Night))
-# Min is 1 (weird..)
+# Max total sample nights is 8, but I see 17 listed fpr decom install difference
+
+bat_data %>%
+  group_by(SiteID) %>%
+  summarize(max_Sample_Night = max(Sample_Night_int),
+            max_Decom_Install_diff = max(Nights_Recorded)) %>%
+  arrange(desc(max_Decom_Install_diff))
+# Many sites seem to have this issue with the decom install difference being significantly larger than number of sample nights
+# Will use max sample night to create detection matrix: 
+# Matrix will have 8 columns for detection sites 
+
+
+
