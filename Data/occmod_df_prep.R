@@ -6,6 +6,7 @@ library(lubridate)
 # Read in data
 load("call_data_cleaned_2020.Rdata")
 
+## DATA EXPLORATION: IDENTIFY ISSUES -----------------------------------------------------------
 # Data overview
 summary(call_data_cleaned_2020)
 
@@ -52,16 +53,42 @@ bat_data %>%
 # Will use max sample night to create detection matrix: 
 # Matrix will have 8 columns for detection sites 
 
+## SET UP EMPTY DETECTION MATRIX -----------------------------------------------------------
 # Add max sampling night to each observation
 max_night_by_SiteID <- bat_data %>%
   group_by(SiteID) %>%
   summarize(max_Sample_Night = max(Sample_Night_int))
 
+max_night_by_SiteID %>% distinct(SiteID) %>% count()
+
 bat_data <- bat_data %>%
   left_join(max_night_by_SiteID, by = "SiteID")
 
+# Find total number of surveyed sites
+bat_data %>%
+  distinct(SiteID) %>% count()
+# 331 total sites sampled
+
+# Make empty detection matrix: 331 rows (sites) x 8 columns (max potential sampling nights)
+empty_det_matrix <- matrix(data = NA, 
+       nrow = 331, 
+       ncol = 8)
+
+empty_det_df <- as.data.frame(empty_det_matrix) %>%
+  rename(night1 = V1,
+         night2 = V2,
+         night3 = V3,
+         night4 = V4,
+         night5 = V5,
+         night6 = V6,
+         night7 = V7,
+         night8 = V8)
+
+sites_det_df <- cbind(max_night_by_SiteID, empty_det_df)
+
+## POSITIVE DETECTIONS -----------------------------------------------------------
 # Filter data to only have Hand_Class as D or P
-bat_data <- bat_data %>%
+bat_data_DP <- bat_data %>%
   filter(Hand_Class %in% c("D", "P"))
 
 # Create new df with only Hand_Class = D
@@ -77,3 +104,31 @@ bat_data_D %>%
 # Then Mylu with 534
 # Steep drop off from there - Myev with 175, sub 100 after that
 
+# Confirming that sites did not have more than one sampling period in 2020 using installation date
+bat_data_D %>%
+  group_by(SiteID, Installation_Date) %>% 
+  distinct(Installation_Date) %>%
+  count(SiteID) %>% filter(n > 1)
+# True for all species with detection of Hand_Class D
+
+# Find sites and their sample nights where Laci was detected
+Laci_det_nights <- bat_data_D %>%
+  filter(Master_Class == "Laci") %>%
+  group_by(SiteID, max_Sample_Night) %>% 
+  distinct(Sample_Night_int)
+
+
+## FILL IN MATRIX -----------------------------------------------------------
+
+
+## WRITE DET MATRIC FUNCTION FOR ANY SPECIES -----------------------------------------------------------
+
+#detection_matrix <- function(data, species){
+  #data %>%
+    #filter(Master_Class == species) %>%
+    
+#}
+  
+  
+  
+  
