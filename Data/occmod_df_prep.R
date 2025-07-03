@@ -179,6 +179,11 @@ sites_det_df %>% filter(SiteID == 1571)
 Laci_det_nights %>% filter(SiteID == 1571)
 # works
 
+## PULL DETECTION MATRIX FROM DF -----------------------------------------------------------
+detection_matrix <- sites_det_df %>%
+  select(night1:night8) %>%
+  as.matrix()
+
 ## WRITE DET MATRIC FUNCTION FOR ANY SPECIES -----------------------------------------------------------
 
 #detection_matrix <- function(data, species){
