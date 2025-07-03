@@ -118,8 +118,66 @@ Laci_det_nights <- bat_data_D %>%
   distinct(Sample_Night_int)
 
 
-## FILL IN MATRIX -----------------------------------------------------------
+## FILL IN DETECTION DF -----------------------------------------------------------
+# Data frames to use: sites_det_df & Laci_det_nights
+for (i in 1:nrow(sites_det_df)) {
+  
+  site <- sites_det_df$SiteID[i] # for site i
+  
+  positive_det_nights <- Laci_det_nights %>%
+    filter(SiteID == site) %>%
+    pull(Sample_Night_int)
+  
+  # Night 1
+  if (1 <= sites_det_df$max_Sample_Night[i]) {
+  sites_det_df$night1[i] <- ifelse(1 %in% positive_det_nights, 1, 0)
+} else {sites_det_df$night1[i] <- NA}
 
+  # Night 2
+  if (2 <= sites_det_df$max_Sample_Night[i]) {
+    sites_det_df$night2[i] <- ifelse(2 %in% positive_det_nights, 1, 0)
+  } else {sites_det_df$night2[i] <- NA}
+
+  # Night 3
+  if (3 <= sites_det_df$max_Sample_Night[i]) {
+    sites_det_df$night3[i] <- ifelse(3 %in% positive_det_nights, 1, 0)
+  } else {sites_det_df$night3[i] <- NA}
+  
+  # Night 4
+  if (4 <= sites_det_df$max_Sample_Night[i]) {
+    sites_det_df$night4[i] <- ifelse(4 %in% positive_det_nights, 1, 0)
+  } else {sites_det_df$night4[i] <- NA}
+  
+  # Night 5
+  if (5 <= sites_det_df$max_Sample_Night[i]) {
+    sites_det_df$night5[i] <- ifelse(5 %in% positive_det_nights, 1, 0)
+  } else {sites_det_df$night5[i] <- NA}
+  
+  # Night 6
+  if (6 <= sites_det_df$max_Sample_Night[i]) {
+    sites_det_df$night6[i] <- ifelse(6 %in% positive_det_nights, 1, 0)
+  } else {sites_det_df$night6[i] <- NA}
+  
+  # Night 7
+  if (7 <= sites_det_df$max_Sample_Night[i]) {
+    sites_det_df$night7[i] <- ifelse(7 %in% positive_det_nights, 1, 0)
+  } else {sites_det_df$night7[i] <- NA}
+  
+  # Night 8
+  if (8 <= sites_det_df$max_Sample_Night[i]) {
+    sites_det_df$night8[i] <- ifelse(8 %in% positive_det_nights, 1, 0)
+  } else {sites_det_df$night8[i] <- NA}
+  
+}
+
+# Check that it worked
+sites_det_df %>% filter(SiteID == 1563)
+Laci_det_nights %>% filter(SiteID == 1563)
+# works
+
+sites_det_df %>% filter(SiteID == 1571)
+Laci_det_nights %>% filter(SiteID == 1571)
+# works
 
 ## WRITE DET MATRIC FUNCTION FOR ANY SPECIES -----------------------------------------------------------
 
