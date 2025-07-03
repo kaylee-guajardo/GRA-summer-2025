@@ -52,5 +52,28 @@ bat_data %>%
 # Will use max sample night to create detection matrix: 
 # Matrix will have 8 columns for detection sites 
 
+# Add max sampling night to each observation
+max_night_by_SiteID <- bat_data %>%
+  group_by(SiteID) %>%
+  summarize(max_Sample_Night = max(Sample_Night_int))
 
+bat_data <- bat_data %>%
+  left_join(max_night_by_SiteID, by = "SiteID")
+
+# Filter data to only have Hand_Class as D or P
+bat_data <- bat_data %>%
+  filter(Hand_Class %in% c("D", "P"))
+
+# Create new df with only Hand_Class = D
+bat_data_D <- bat_data %>%
+  filter(Hand_Class == "D")
+
+bat_data_D %>%
+  group_by(Master_Class) %>%
+  count() %>%
+  arrange(desc(n))
+# Laci bat species has most number of definitive detection (656)
+# Followed by Lano with 582
+# Then Mylu with 534
+# Steep drop off from there - Myev with 175, sub 100 after that
 
